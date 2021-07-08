@@ -1,44 +1,48 @@
 package com.moevm.practice.core;
 
-import javax.swing.text.StyledEditorKit;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Graph {
-    Integer numberOfEdges = 0;
-    ArrayList<ArrayList<Vertex>> g = new ArrayList<>(); // graph
-    ArrayList<ArrayList<Vertex>> gr = new ArrayList<>(); // Transpose graph
+    public Integer numberOfEdges = 0;
+    ArrayList<ArrayList<Vertex>> graph = new ArrayList<>(100); // graph
+    ArrayList<ArrayList<Vertex>> graphT = new ArrayList<>(100); // Transpose graph
     ArrayList<Vertex> order = new ArrayList<>(); // order in dfs1
     ArrayList<Vertex> component = new ArrayList<>();
     ArrayList<Vertex> allVertex = new ArrayList<>();
     ArrayList<Boolean> usedVertex = new ArrayList<>();
 
-    void readGraph() {
+    public void readGraph() {
         numberOfEdges = new Scanner(System.in).nextInt();
         for (int i = 0; i < numberOfEdges; i++) {
-            addEdge();
+            Vertex v1 = readVertex();
+            Vertex v2 = readVertex();
+            addEdge(v1, v2);
         }
     }
 
-    void addEdge() {
-        Vertex v1 = readVertex();
-        Vertex v2 = readVertex();
+    public void addEdge(Vertex v1, Vertex v2) {
         // TODO: map[vertex, int] to connect int to vertex
-        g.get(v1.toInt).add(v2);
-        gr.get(v2.toInt).add(v1);
+        numberOfEdges++;
+        ArrayList<Vertex> ar = new ArrayList<>();
+        ar.add(v1);
+        graph.add(ar);
+        ar.clear();
+        ar.add(v2);
+        graphT.add(ar);
     }
 
     Vertex readVertex() {
         Vertex v = new Vertex();
-        int num = new Scanner(System.in).nextInt();
         //TODO: template Vertex
+        int num = new Scanner(System.in).nextInt();
         v.toInt = num;
         return v;
     }
 
     void dfs1(Vertex vertex) {
         usedVertex.set(vertex.toInt, true);
-        for (Vertex v : g.get(vertex.toInt)) {
+        for (Vertex v : graph.get(vertex.toInt)) {
             if (!usedVertex.get(v.toInt)) {
                 dfs1(v);
             }
@@ -49,7 +53,7 @@ public class Graph {
     void dfs2(Vertex vertex) {
         usedVertex.set(vertex.toInt, true);
         component.add(vertex);
-        for (Vertex v : gr.get(vertex.toInt)) {
+        for (Vertex v : graphT.get(vertex.toInt)) {
             if (!usedVertex.get(v.toInt)) {
                 dfs2(v);
             }
