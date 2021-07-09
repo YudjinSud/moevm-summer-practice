@@ -5,12 +5,77 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.moevm.practice.controller.AlgorithmController">
-    <children>
-        <Label text="Secondary View" />
-
-    </children>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TextArea?>
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.moevm.practice.controller.AlgorithmController">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        <Insets top="10.0" left="10.0"/>
     </padding>
+    <HBox>
+        <HBox fx:id="stateCanvasHolder">
+            <VBox>
+                <children>
+                    <Label>Предыдущее состояние</Label>
+                    <Canvas fx:id="previousStateCanvas" height="300" width="200"/>
+                </children>
+                <padding>
+                    <Insets right="5.0"/>
+                </padding>
+            </VBox>
+
+            <VBox>
+                <children>
+                    <Label>Текущее состояние</Label>
+                    <Canvas fx:id="currentStateCanvas" height="300" width="200"/>
+                </children>
+            </VBox>
+        </HBox>
+
+        <VBox>
+            <padding>
+                <Insets top="10.0" left="10.0"/>
+            </padding>
+            <HBox>
+                <children>
+                    <Button fx:id="stepForward" text="Шаг вперед" onAction="#stepForward"/>
+                    <Button fx:id="stepBack" text="Шаг назад" onAction="#stepBack"/>
+                </children>
+            </HBox>
+            <padding>
+                <Insets top="10.0"/>
+            </padding>
+            <HBox>
+                <children>
+                    <Button fx:id="pause" text="Пауза" onAction="#pause"/>
+                    <Button fx:id="resume" text="Продолжить" onAction="#resume"/>
+                </children>
+            </HBox>
+            <HBox>
+                <Button fx:id="halt" text="Завершить" onAction="#halt"/>
+            </HBox>
+            <HBox>
+                <Button fx:id="processToFinish" text="Просчитать до конца" onAction="#processToFinish"/>
+            </HBox>
+
+            <VBox>
+                <children>
+                    <Label>Время выхода из вершин</Label>
+                    <TextArea fx:id="topSortLog" editable="false" maxWidth="150"/>
+                </children>
+            </VBox>
+
+        </VBox>
+
+
+    </HBox>
+    <VBox>
+        <children>
+            <Label>Журнал событий</Label>
+            <TextArea fx:id="mainLog" editable="false" maxWidth="410"/>
+        </children>
+    </VBox>
+
+
 </VBox>

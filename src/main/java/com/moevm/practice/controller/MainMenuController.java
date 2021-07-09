@@ -4,30 +4,26 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import com.moevm.practice.gui.GuiUtils;
 import javafx.fxml.FXML;
 
-import com.moevm.practice.gui.MainMenuLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
+
+import com.moevm.practice.gui.GuiLoader;
 
 public class MainMenuController implements Initializable {
 
     @FXML
-    Canvas canvas;
+    private Canvas canvas;
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.out.println("Main menu loaded!");
         System.out.println(this.canvas.getHeight());
-        GraphicsContext context = canvas.getGraphicsContext2D();
-        context.setFill(Color.BLACK);
-        context.strokeRect(
-                0,
-                0,
-                canvas.getWidth(),
-                canvas.getHeight());
+        GuiUtils.setBorderCanvas(this.canvas);
+
     }
 
 
@@ -41,7 +37,7 @@ public class MainMenuController implements Initializable {
          *  Логгер тоже будет подписан на изменения модели.
          *  Контроллер взаимодействует с моделью через Фасад, этот же фасад рассылает обновления.
          */
-        MainMenuLoader.setRoot("algorithmMenu");
+        GuiLoader.setRoot("algorithmMenu");
     }
 
     @FXML

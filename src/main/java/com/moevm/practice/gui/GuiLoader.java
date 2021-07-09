@@ -11,11 +11,11 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class MainMenuLoader {
+public class GuiLoader {
     private static Scene scene;
 
     public static void run(Stage stage) throws  IOException {
-        scene = new Scene(loadFXML("mainMenu"), 640, 480);
+        scene = new Scene(loadFXML("algorithmMenu"), 640, 480);
         stage.setScene(scene);
         stage.show();
     }

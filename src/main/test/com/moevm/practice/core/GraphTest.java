@@ -19,6 +19,10 @@ public class GraphTest {
         this.graph.addEdge(v1, v2);
         assertEquals(graph.numberOfEdges,1);
         //assertEquals(1, 1);
+    }
+
+    @Test
+    public void algoTest() {
 
     }
 
