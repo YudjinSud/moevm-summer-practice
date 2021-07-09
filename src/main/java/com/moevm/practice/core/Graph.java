@@ -4,18 +4,17 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Graph {
-    private final int MAX_VERTEXES = 100;
+    private final int MAX_VERTEX = 100;
     public Integer numberOfEdges = 0;
-    ArrayList<ArrayList<Vertex>> graph = new ArrayList<>(MAX_VERTEXES); // graph
-    ArrayList<ArrayList<Vertex>> graphT = new ArrayList<>(MAX_VERTEXES); // Transpose graph
+    ArrayList<ArrayList<Vertex>> graph = new ArrayList<>(MAX_VERTEX); // graph
+    ArrayList<ArrayList<Vertex>> graphT = new ArrayList<>(MAX_VERTEX); // Transpose graph
     ArrayList<Vertex> order = new ArrayList<>(); // order in dfs1
     ArrayList<Vertex> component = new ArrayList<>();
     ArrayList<Vertex> allVertex = new ArrayList<>();
-    ArrayList<Boolean> usedVertex = new ArrayList<>();
-
+    ArrayList<Boolean> usedVertex = new ArrayList<>(MAX_VERTEX);
 
     void setupGraph(){
-        for(int i = 0; i < MAX_VERTEXES; i++){
+        for(int i = 0; i < MAX_VERTEX; i++){
             graph.add(new ArrayList<Vertex>());
             graphT.add(new ArrayList<Vertex>());
         }
@@ -30,12 +29,19 @@ public class Graph {
         return false;
     }
 
+    void addVertex(Vertex v){
+        //TODO: if v is unique, but we need map[vertex, int]
+        allVertex.add(v);
+    }
+
     public void readGraph() {
         numberOfEdges = new Scanner(System.in).nextInt();
         for (int i = 0; i < numberOfEdges; i++) {
             Vertex v1 = readVertex();
             Vertex v2 = readVertex();
             addEdge(v1, v2);
+            addVertex(v1);
+            addVertex(v2);
         }
     }
 
