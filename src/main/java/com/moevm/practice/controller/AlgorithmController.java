@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import com.moevm.practice.core.commands.StepBackCommand;
+import com.moevm.practice.core.commands.StepForwardCommand;
 import com.moevm.practice.core.graph.Graph;
 import com.moevm.practice.core.graph.GraphFacade;
 import com.moevm.practice.gui.GuiUtils;
@@ -35,9 +37,13 @@ public class AlgorithmController implements Initializable {
     @FXML
     private Button graphFromFileInputButton;
 
-    private Graph graph;
+    private GraphFacade graphFacade;
 
     private BufferedReader graphReader;
+
+    private StepForwardCommand cmdForward;
+
+    private StepBackCommand cmdBack;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -49,11 +55,12 @@ public class AlgorithmController implements Initializable {
     @FXML
     private void stepForward() {
 
+        cmdForward.execute();
     }
 
     @FXML
     private void stepBack() {
-
+        cmdBack.execute();
     }
 
     @FXML
@@ -80,10 +87,10 @@ public class AlgorithmController implements Initializable {
     }
 
     private void initGraph() {
-        graph = new Graph();
-        GraphFacade graphFacade = new GraphFacade(graph, graphReader);
-        graph.mainAlgo();
-        int ab = 3;
+        graphFacade = new GraphFacade(graphReader);
+        graphFacade.graph.mainAlgo();
+        cmdForward = new StepForwardCommand(graphFacade.graph.history);
+        cmdBack = new StepBackCommand(graphFacade.graph.history);
     }
 
     @FXML

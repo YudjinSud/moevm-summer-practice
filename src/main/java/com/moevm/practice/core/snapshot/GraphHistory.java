@@ -9,6 +9,10 @@ public class GraphHistory {
 
     private Graph graph;
 
+    public int getSize() {
+        return this.snapshots.size();
+    }
+
     public GraphHistory(Graph graph) {
         this.snapshots = new ArrayList<>();
         this.graph = graph;

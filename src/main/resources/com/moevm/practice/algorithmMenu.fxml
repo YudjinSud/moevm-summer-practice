@@ -38,7 +38,7 @@
             <VBox>
                 <children>
                     <Label>Предыдущее состояние</Label>
-                    <Canvas fx:id="previousStateCanvas" height="300" width="200"/>
+                    <Canvas fx:id="previousStateCanvas" height="300" width="350"/>
                 </children>
                 <padding>
                     <Insets right="5.0"/>
@@ -48,7 +48,7 @@
             <VBox>
                 <children>
                     <Label>Текущее состояние</Label>
-                    <Canvas fx:id="currentStateCanvas" height="300" width="200"/>
+                    <Canvas fx:id="currentStateCanvas" height="300" width="350"/>
                 </children>
             </VBox>
         </HBox>
@@ -82,7 +82,6 @@
                     <TextArea fx:id="topSortLog" editable="false" maxWidth="150"/>
                 </children>
             </VBox>
-
         </VBox>
 
 

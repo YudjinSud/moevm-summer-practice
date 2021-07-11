@@ -40,7 +40,7 @@ public class Graph<T> implements Serializable {
         this.component = graph.component;
     }
 
-    private GraphHistory history;
+    public GraphHistory history;
 
 
     public Graph() {

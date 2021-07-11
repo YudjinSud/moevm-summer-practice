@@ -9,7 +9,12 @@ public class StepForwardCommand extends Command{
 
     @Override
     public boolean execute() {
-        System.out.println(this.history.getSnapshot(snapshotPointer++));
+        if(snapshotPointer < this.history.getSize()) {
+            System.out.println(this.history.getSnapshot(snapshotPointer++));
+        }
+        else {
+            System.out.println("Вперед двигаться больше нельзя!");
+        }
 
         return true;
     }

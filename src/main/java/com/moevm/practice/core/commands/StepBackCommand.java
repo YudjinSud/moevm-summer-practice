@@ -9,8 +9,12 @@ public class StepBackCommand extends Command {
 
     @Override
     public boolean execute() {
-        System.out.println(this.history.getSnapshot(snapshotPointer--));
-
+        if(snapshotPointer > 0) {
+            System.out.println(this.history.getSnapshot(snapshotPointer--));
+        }
+        else {
+            System.out.println("Назад двигаться больше нельзя!");
+        }
 
         return true;
     }

@@ -9,7 +9,9 @@ import java.io.IOException;
  */
 public class GraphFacade {
 
-    public GraphFacade(Graph graph, BufferedReader graphBR) {
+    public Graph graph;
+
+    public GraphFacade(BufferedReader graphBR) {
         graph = new Graph<>();
         try {
             StringBuilder sb = new StringBuilder();
