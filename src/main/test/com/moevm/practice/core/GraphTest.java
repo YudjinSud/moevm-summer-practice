@@ -78,14 +78,14 @@ public class GraphTest {
         addIntegerEdge(5, 4);
         addIntegerEdge(7, 3);
         addIntegerEdge(7, 6);
-        System.out.print(graph.toString());
+        System.out.print(graph);
         graph.mainAlgo();
     }
 
     @Test
     public void testEmpty() {
         graph = new Graph<Integer>();
-        System.out.print(graph.toString());
+        System.out.print(graph);
         graph.mainAlgo();
     }
 

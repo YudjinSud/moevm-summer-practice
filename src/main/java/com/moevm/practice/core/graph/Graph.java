@@ -4,10 +4,7 @@ import com.moevm.practice.core.snapshot.GraphHistory;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.*;
-
-import static java.lang.System.*;
 
 public class Graph<T> implements Serializable {
 
@@ -29,7 +26,7 @@ public class Graph<T> implements Serializable {
         this.component = component;
     }
 
-    public Graph(Graph graph) {
+    public Graph(Graph<T> graph) {
         this(); // Вызов самого базового конструктора
         this.graphAdjacencyList = graph.graphAdjacencyList;
         this.graphTransposedAdjacencyList = graph.graphTransposedAdjacencyList;
@@ -48,17 +45,17 @@ public class Graph<T> implements Serializable {
     }
 
     public class Snapshot {
-        private Graph graph;
+        private final Graph<T> graph;
 
-        private Map<T, ArrayList<T>> graphAdjacencyList;
-        private Map<T, ArrayList<T>> graphTransposedAdjacencyList;
-        private Map<T, Boolean> used;
-        private Map<T, GraphParams> params;
-        private ArrayList<T> allVertex;
-        private ArrayList<T> order;
-        private ArrayList<T> component;
+        private final Map<T, ArrayList<T>> graphAdjacencyList;
+        private final Map<T, ArrayList<T>> graphTransposedAdjacencyList;
+        private final Map<T, Boolean> used;
+        private final Map<T, GraphParams> params;
+        private final ArrayList<T> allVertex;
+        private final ArrayList<T> order;
+        private final ArrayList<T> component;
 
-        public Snapshot(Graph graph, Map<T, ArrayList<T>> graphAdjacencyList,
+        public Snapshot(Graph<T> graph, Map<T, ArrayList<T>> graphAdjacencyList,
                         Map<T, ArrayList<T>> graphTransposedAdjacencyList,
                         Map<T, Boolean> used,
                         Map<T, GraphParams> params,
@@ -209,9 +206,9 @@ public class Graph<T> implements Serializable {
         StringBuilder builder = new StringBuilder();
         builder.append("\nGraph :: \n");
         for (T v : graphAdjacencyList.keySet()) {
-            builder.append(v.toString() + ": ");
+            builder.append(v.toString()).append(": ");
             for (T w : graphAdjacencyList.get(v)) {
-                builder.append(w.toString() + " ");
+                builder.append(w.toString()).append(" ");
             }
             builder.append("\n");
         }
@@ -242,8 +239,8 @@ public class Graph<T> implements Serializable {
         }
     }
 
-    private void printComponent() {
-        System.out.println("\nStrongly connected components ::");
+    private void printComponent(int num) {
+        System.out.println("\nStrongly connected component number " + num + " ::");
         for (T s : component) {
             System.out.print(s + " ");
         }
@@ -264,11 +261,12 @@ public class Graph<T> implements Serializable {
             used.put(v, false);
         }
         this.history.backUp();
+        int num = 1;
         for (T v : allVertex) {
-            T z = order.get(order.size() - params.get(v).num - 1);
+            T z = order.get(order.size() - getNum(v) - 1);
             if (!used.get(z)) {
                 dfs2(z);
-                printComponent();
+                printComponent(num++);
                 component.clear();
                 this.history.backUp();
             }
