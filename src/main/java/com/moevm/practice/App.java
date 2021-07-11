@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 import com.moevm.practice.gui.GuiLoader;
 
@@ -15,7 +16,19 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        Application.launch();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Вы хотите использовать CLI(1) или GUI(2) ?");
+        int res = scanner.nextInt();
+        switch (res) {
+            case 1:
+
+                break;
+            case 2:
+                Application.launch();
+                break;
+            default:
+                System.out.println("Нет такого варианта!");
+        }
     }
 
 }
