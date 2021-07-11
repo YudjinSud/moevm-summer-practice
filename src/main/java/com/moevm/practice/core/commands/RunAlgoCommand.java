@@ -1,16 +1,16 @@
 package com.moevm.practice.core.commands;
 
-import com.moevm.practice.core.Graph;
+import com.moevm.practice.core.graph.Graph;
+import com.moevm.practice.core.snapshot.GraphHistory;
 
 public class RunAlgoCommand extends Command {
 
-    RunAlgoCommand(Graph graph) {
-        super(graph);
+    public RunAlgoCommand(GraphHistory history) {
+        super(history);
     }
 
     @Override
     public boolean execute() {
-        graph.mainAlgo();
         return false;
     }
 }

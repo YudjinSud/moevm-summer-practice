@@ -1,5 +1,6 @@
 package com.moevm.practice;
 
+import com.moevm.practice.cli.CLI;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -18,10 +19,12 @@ public class App extends Application {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Вы хотите использовать CLI(1) или GUI(2) ?");
-        int res = scanner.nextInt();
+        //int res = scanner.nextInt();
+        int res = 2;
         switch (res) {
             case 1:
-
+                CLI cli = new CLI();
+                cli.mainCLI();
                 break;
             case 2:
                 Application.launch();

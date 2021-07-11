@@ -15,4 +15,5 @@ public class GuiUtils {
                 canvas.getWidth(),
                 canvas.getHeight());
     }
+
 }

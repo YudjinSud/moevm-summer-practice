@@ -14,10 +14,10 @@ import java.io.IOException;
 public class GuiLoader {
     private static Scene scene;
 
-    private static final String GUI_LOAD = "mainMenu";
+    private static final String GUI_LOAD = "algorithmMenu";
 
     public static void run(Stage stage) throws  IOException {
-        scene = new Scene(loadFXML(GUI_LOAD), 640, 480);
+        scene = new Scene(loadFXML(GUI_LOAD), 940, 680);
         stage.setScene(scene);
         stage.show();
     }

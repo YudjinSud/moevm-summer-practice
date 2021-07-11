@@ -13,6 +13,26 @@
     <padding>
         <Insets top="10.0" left="10.0"/>
     </padding>
+    <HBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171"
+          xmlns:fx="http://javafx.com/fxml/1">
+        <children>
+            <Button fx:id="graphFromFileInputButton" text="Ввести граф из файла" onAction="#inputGraphFromFile"/>
+            <Button fx:id="graphFromKeyboardInputButton" text="Ввести граф c клавиатуры" onAction="#inputGraphFromKeyboard"/>
+        </children>
+        <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        </padding>
+    </HBox>
+    <HBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171"
+          xmlns:fx="http://javafx.com/fxml/1">
+        <children>
+            <Button fx:id="resetGraph" text="Сбросить" onAction="#resetGraph"/>
+            <Button fx:id="saveGraph" text="Сохранить" onAction="#saveGraph"/>
+        </children>
+        <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        </padding>
+    </HBox>
     <HBox>
         <HBox fx:id="stateCanvasHolder">
             <VBox>
@@ -51,9 +71,6 @@
                     <Button fx:id="pause" text="Пауза" onAction="#pause"/>
                     <Button fx:id="resume" text="Продолжить" onAction="#resume"/>
                 </children>
-            </HBox>
-            <HBox>
-                <Button fx:id="halt" text="Завершить" onAction="#halt"/>
             </HBox>
             <HBox>
                 <Button fx:id="processToFinish" text="Просчитать до конца" onAction="#processToFinish"/>
