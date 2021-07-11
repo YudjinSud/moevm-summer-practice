@@ -2,111 +2,130 @@ package com.moevm.practice.core;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.*;
 
-public class Graph {
-    private final int MAX_VERTEX = 100;
+import static java.lang.System.*;
+
+public final class Graph<T> {
+    private class Params {
+        int num = -1;
+    }
+
     public Integer numberOfEdges = 0;
-    ArrayList<ArrayList<Vertex>> graph = new ArrayList<>(MAX_VERTEX); // graph
-    ArrayList<ArrayList<Vertex>> graphT = new ArrayList<>(MAX_VERTEX); // Transpose graph
-    ArrayList<Vertex> order = new ArrayList<>(); // order in dfs1
-    ArrayList<Vertex> component = new ArrayList<>();
-    ArrayList<Vertex> allVertex = new ArrayList<>();
-    ArrayList<Boolean> usedVertex = new ArrayList<>(MAX_VERTEX);
+    private Map<T, ArrayList<T>> graph = new HashMap<>();
+    private Map<T, ArrayList<T>> graphTransposed = new HashMap<>();
+    private Map<T, Boolean> used = new HashMap<>();
+    private Map<T, Params> params = new HashMap<>();
+    private ArrayList<T> allVertex = new ArrayList<>();
+    private ArrayList<T> order = new ArrayList<>(); // order in dfs1
+    private ArrayList<T> component = new ArrayList<>();
 
-    void setupGraph(){
-        for(int i = 0; i < MAX_VERTEX; i++){
-            graph.add(new ArrayList<Vertex>());
-            graphT.add(new ArrayList<Vertex>());
-        }
+    public Graph getInstance() {
+        return this;
     }
 
-    public boolean checkEdge(Vertex v1, Vertex v2) {
-        for (Vertex v : graph.get(v1.toInt)) {
-            if (v.toInt == v2.toInt) {
-                return true;
-            }
-        }
-        return false;
+    void addVertex(T vertex) {
+        graph.put(vertex, new ArrayList<T>());
+        graphTransposed.put(vertex, new ArrayList<T>());
     }
 
-    void addVertex(Vertex v){
-        //TODO: if v is unique, but we need map[vertex, int]
-        allVertex.add(v);
+    public int getNum(T s){
+        return params.get(s).num;
     }
 
     public void readGraph() {
-        numberOfEdges = new Scanner(System.in).nextInt();
+        numberOfEdges = new Scanner(in).nextInt();
         for (int i = 0; i < numberOfEdges; i++) {
-            Vertex v1 = readVertex();
-            Vertex v2 = readVertex();
-            addEdge(v1, v2);
-            addVertex(v1);
-            addVertex(v2);
+
+            // ?????
+
         }
     }
 
-    public void addEdge(Vertex v1, Vertex v2) {
-        // TODO: map[vertex, int] to connect int to vertex
+    public void addEdge(T from, T to) {
+        if (!graph.containsKey(from)) {
+            addVertex(from);
+            Params p = new Params();
+            p.num = allVertex.size();
+            params.put(from, p);
+            allVertex.add(from);
+        }
+        if (!graph.containsKey(to)) {
+            addVertex(to);
+            Params p = new Params();
+            p.num = allVertex.size();
+            params.put(to, p);
+            allVertex.add(to);
+        }
+        graph.get(from).add(to);
+        graphTransposed.get(to).add(from);
         numberOfEdges++;
-        graph.get(v1.toInt).add(v2);
-        graphT.get(v2.toInt).add(v1);
-
     }
 
-    Vertex readVertex() {
-        Vertex v = new Vertex();
-        //TODO: template Vertex
-        int num = new Scanner(System.in).nextInt();
-        v.toInt = num;
-        return v;
+    public boolean hasVertex(T v) {
+        return graph.containsKey(v);
     }
 
-    void dfs1(Vertex vertex) {
-        usedVertex.set(vertex.toInt, true);
-        for (Vertex v : graph.get(vertex.toInt)) {
-            if (!usedVertex.get(v.toInt)) {
-                dfs1(v);
+    public boolean hasEdge(T from, T to) {
+        return graph.get(from).contains(to);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("\n Graph :: \n");
+        for (T v : graph.keySet()) {
+            builder.append(v.toString() + ": ");
+            for (T w : graph.get(v)) {
+                builder.append(w.toString() + " ");
+            }
+            builder.append("\n");
+        }
+        builder.append("\n");
+        return (builder.toString());
+    }
+
+    void dfs1(T vertex) {
+        used.put(vertex, true);
+        for (T s : graph.get(vertex)) {
+            if (!used.get(s)) {
+                dfs1(s);
             }
         }
         order.add(vertex);
     }
 
-    void dfs2(Vertex vertex) {
-        usedVertex.set(vertex.toInt, true);
+    void dfs2(T vertex) {
+        used.put(vertex, true);
         component.add(vertex);
-        for (Vertex v : graphT.get(vertex.toInt)) {
-            if (!usedVertex.get(v.toInt)) {
-                dfs2(v);
+        for (T s : graphTransposed.get(vertex)) {
+            if (!used.get(s)) {
+                dfs2(s);
             }
         }
     }
 
-    void eraseUsed() {
-        for (int i = 0; i < usedVertex.size(); i++) {
-            usedVertex.set(i, false);
+    private void printComponent() {
+        for (T s : component) {
+            System.out.print(s + " ");
         }
+        System.out.println();
     }
 
-    void printComponent() {
-        for (Vertex ver : component) {
-            ver.printVertex();
-        }
-    }
-
-    void mainAlgo() {
-        setupGraph();
-        readGraph();
-        eraseUsed();
-        for (Vertex v : allVertex) {
-            Vertex z = order.get(order.size() - v.toInt - 1);
-            if (!usedVertex.get(z.toInt)) {
+    public void mainAlgo() {
+        //readGraph();
+        used.clear();
+        for(T v : allVertex) used.put(v,false);
+        for (T z : allVertex){
+            if (!used.get(z)) {
                 dfs1(z);
             }
         }
-        eraseUsed();
-        for (Vertex v : allVertex) {
-            Vertex z = order.get(order.size() - v.toInt - 1);
-            if (!usedVertex.get(z.toInt)) {
+        used.clear();
+        for(T v : allVertex) used.put(v,false);
+        for (T v : allVertex) {
+            T z = order.get(order.size() - params.get(v).num - 1); // ???
+            if (!used.get(z)) {
                 dfs2(z);
                 printComponent();
                 component.clear();
