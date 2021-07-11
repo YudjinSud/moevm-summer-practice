@@ -7,11 +7,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import com.moevm.practice.core.commands.StepForwardCommand;
 import com.moevm.practice.core.graph.Graph;
 import com.moevm.practice.core.graph.GraphFacade;
 import com.moevm.practice.gui.GuiUtils;
-import com.moevm.practice.gui.GuiLoader;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;

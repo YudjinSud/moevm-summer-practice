@@ -3,6 +3,7 @@ package com.moevm.practice.core;
 import com.moevm.practice.core.graph.Graph;
 import org.junit.Test;
 
+
 import static org.junit.jupiter.api.Assertions.*;
 
 //https://www.vogella.com/tutorials/JUnit/article.html

@@ -1,10 +1,10 @@
 package com.moevm.practice.cli;
 
-import com.moevm.practice.core.graph.Graph;
-
 import java.io.*;
 import java.util.*;
 import java.util.Scanner;
+
+import com.moevm.practice.core.graph.Graph;
 
 public class CLI {
     public static Scanner in = new Scanner(System.in);
