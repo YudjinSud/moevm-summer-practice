@@ -1,5 +1,6 @@
 package com.moevm.practice.core.commands;
 
+import com.moevm.practice.core.graph.Graph;
 import com.moevm.practice.core.snapshot.GraphHistory;
 
 public class StepForwardCommand extends Command{
@@ -8,15 +9,17 @@ public class StepForwardCommand extends Command{
     }
 
     @Override
-    public boolean execute() {
-        if(snapshotPointer < this.history.getSize()) {
-            System.out.println(this.history.getSnapshot(snapshotPointer++));
+    public Graph.Snapshot execute() {
+        if(snapshotPointer < this.history.getSize() - 1) {
+            System.out.println(this.history.getSnapshot(++snapshotPointer));
+            System.out.println(snapshotPointer);
+            return this.history.getSnapshot(snapshotPointer);
         }
         else {
             System.out.println("Вперед двигаться больше нельзя!");
         }
 
-        return true;
+        return this.history.getSnapshot(this.history.getSize() - 1);
     }
 
 }

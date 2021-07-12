@@ -1,5 +1,6 @@
 package com.moevm.practice.core.commands;
 
+import com.moevm.practice.core.graph.Graph;
 import com.moevm.practice.core.snapshot.GraphHistory;
 
 public abstract class Command {
@@ -11,5 +12,5 @@ public abstract class Command {
         this.history = history;
     }
 
-    public abstract boolean execute();
+    public abstract Graph.Snapshot execute();
 }

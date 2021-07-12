@@ -17,7 +17,7 @@ public class GuiLoader {
     private static final String GUI_LOAD = "algorithmMenu";
 
     public static void run(Stage stage) throws  IOException {
-        scene = new Scene(loadFXML(GUI_LOAD), 940, 680);
+        scene = new Scene(loadFXML(GUI_LOAD), 1280, 720);
         stage.setScene(scene);
         stage.show();
     }

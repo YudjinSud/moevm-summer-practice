@@ -20,7 +20,7 @@ public class App extends Application {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Вы хотите использовать CLI(1) или GUI(2) ?");
         //int res = scanner.nextInt();
-        int res = 1;
+        int res = 2;
         switch (res) {
             case 1:
                 CLI cli = new CLI();

@@ -1,6 +1,8 @@
 package com.moevm.practice.core.graph;
 
 
+import com.moevm.practice.core.snapshot.GraphHistory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 
@@ -9,7 +11,15 @@ import java.io.IOException;
  */
 public class GraphFacade {
 
-    public Graph graph;
+    private Graph graph;
+
+    public GraphHistory getHistory() {
+        return graph.history;
+    }
+
+    public Graph getGraph() {
+        return graph;
+    }
 
     public GraphFacade(BufferedReader graphBR) {
         graph = new Graph<>();
@@ -18,6 +28,9 @@ public class GraphFacade {
             String line = graphBR.readLine();
 
             while (line != null) {
+                if (line.equals("")) {
+                   return;
+                }
                 String[] tmp = line.split(",");
                 graph.addEdge(
                         Integer.parseInt(tmp[0]),
@@ -28,8 +41,10 @@ public class GraphFacade {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        System.out.println(graph.toString());
-//        graph.mainAlgo();
+    }
+
+    public void runMainAlgo() {
+        graph.mainAlgo();
     }
 
 }
