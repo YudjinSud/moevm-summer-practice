@@ -62,6 +62,9 @@ public class AlgorithmController implements Initializable {
     private Button graphFromKeyboardInputButton;
 
     @FXML
+    private Button runAlgoButton;
+
+    @FXML
     private Button resetGraphButton;
 
     @FXML
@@ -180,6 +183,8 @@ public class AlgorithmController implements Initializable {
         previousStateGraphVisualizer = new GraphVisualizer(previousStateCanvas, previousSnapshot);
         currentStateGraphVisualizer = new GraphVisualizer(currentStateCanvas, currentSnapshot);
         previousStateGraphVisualizer.setGuiVerticesList(currentStateGraphVisualizer.getGuiVerticesList());
+        previousStateGraphVisualizer.drawGraph(previousSnapshot);
+        currentStateGraphVisualizer.drawGraph(currentSnapshot);
         // updateGraphsCanvas();
     }
 
@@ -249,6 +254,7 @@ public class AlgorithmController implements Initializable {
         pauseButton.setDisable(state);
         resumeButton.setDisable(state);
         processToFinishButton.setDisable(state);
+        runAlgoButton.setDisable(state);
     }
 
     @FXML

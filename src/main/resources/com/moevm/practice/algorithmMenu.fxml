@@ -8,34 +8,34 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.GridPane?>
 <VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.moevm.practice.controller.AlgorithmController"
       fx:id="window">
     <padding>
         <Insets top="10.0" left="10.0"/>
     </padding>
-    <HBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171"
-          xmlns:fx="http://javafx.com/fxml/1">
-        <children>
-            <Button fx:id="graphFromFileInputButton" text="Ввести граф из файла" onAction="#inputGraphFromFile"/>
-            <Button fx:id="graphFromKeyboardInputButton" text="Ввести граф c клавиатуры"
-                    onAction="#inputGraphFromKeyboard"/>
-        </children>
-        <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-        </padding>
-    </HBox>
-    <HBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/8.0.171"
-          xmlns:fx="http://javafx.com/fxml/1">
-        <children>
-            <Button fx:id="resetGraphButton" text="Сбросить" onAction="#resetGraph"/>
-            <Button fx:id="saveGraphButton" text="Сохранить" onAction="#saveGraph"/>
-            <Button fx:id="runAlgoButton" text="Запустить" onAction="#saveGraph"/>
-        </children>
-        <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-        </padding>
-    </HBox>
+
+    <BorderPane xmlns:fx="http://javafx.com/fxml/1">
+        <top>
+            <ToolBar>
+                <Region styleClass="spacer"/>
+                <HBox styleClass="segmented-button-bar">
+                    <Button fx:id="graphFromFileInputButton" text="Ввести граф из файла"
+                            onAction="#inputGraphFromFile"/>
+                    <Button fx:id="graphFromKeyboardInputButton" text="Ввести граф c клавиатуры"
+                            onAction="#inputGraphFromKeyboard"/>
+                    <Button fx:id="resetGraphButton" text="Сбросить" onAction="#resetGraph"/>
+                    <Button fx:id="saveGraphButton" text="Сохранить" onAction="#saveGraph"/>
+                    <Button fx:id="runAlgoButton" text="Запустить" onAction="#saveGraph"/>
+                </HBox>
+            </ToolBar>
+        </top>
+    </BorderPane>
+
     <HBox>
         <HBox fx:id="stateCanvasHolder">
             <VBox>
@@ -56,45 +56,37 @@
             </VBox>
         </HBox>
 
-        <VBox>
-            <padding>
-                <Insets top="10.0" left="10.0"/>
-            </padding>
-            <HBox>
-                <children>
-                    <Button fx:id="stepForwardButton" text="Шаг вперед" onAction="#stepForward"/>
-                    <Button fx:id="stepBackButton" text="Шаг назад" onAction="#stepBack"/>
-                </children>
-            </HBox>
-            <padding>
-                <Insets top="10.0"/>
-            </padding>
-            <HBox>
-                <children>
-                    <Button fx:id="pauseButton" text="Пауза" onAction="#pause"/>
-                    <Button fx:id="resumeButton" text="Продолжить" onAction="#resume"/>
-                </children>
-            </HBox>
-            <HBox>
-                <Button fx:id="processToFinishButton" text="Просчитать до конца" onAction="#processToFinish"/>
-            </HBox>
 
-            <VBox>
-                <children>
-                    <Label>Время выхода из вершин</Label>
-                    <TextArea fx:id="topSortLog" editable="false" maxWidth="150"/>
-                </children>
-            </VBox>
-        </VBox>
-
-
+        <!--            <VBox>-->
+        <!--                <children>-->
+        <!--                    <Label>Время выхода из вершин</Label>-->
+        <!--                    <TextArea fx:id="topSortLog" editable="false" maxWidth="150"/>-->
+        <!--                </children>-->
+        <!--            </VBox>-->
     </HBox>
+
+
     <VBox>
         <children>
             <Label>Журнал событий</Label>
-            <TextArea fx:id="mainLog" editable="false" maxWidth="450"/>
+            <TextArea fx:id="mainLog" editable="false" maxWidth="1000"/>
         </children>
     </VBox>
 
+    <GridPane xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10">
+        <padding>
+            <Insets top="25" right="25" bottom="25" left="25"/>
+        </padding>
+
+
+        <HBox spacing="10" alignment="bottom_right"
+              GridPane.columnIndex="1" GridPane.rowIndex="4">
+            <Button fx:id="stepForwardButton" text="Шаг вперед" onAction="#stepForward"/>
+            <Button fx:id="stepBackButton" text="Шаг назад" onAction="#stepBack"/>
+            <Button fx:id="pauseButton" text="Пауза" onAction="#pause"/>
+            <Button fx:id="resumeButton" text="Продолжить" onAction="#resume"/>
+            <Button fx:id="processToFinishButton" text="Просчитать до конца" onAction="#processToFinish"/>
+        </HBox>
+    </GridPane>
 
 </VBox>
