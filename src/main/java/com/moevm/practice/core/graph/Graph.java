@@ -47,6 +47,34 @@ public class Graph<T> implements Serializable {
     public class Snapshot {
         private final Graph<T> graph;
 
+        public Map<T, ArrayList<T>> getGraphAdjacencyList() {
+            return graphAdjacencyList;
+        }
+
+        public Map<T, ArrayList<T>> getGraphTransposedAdjacencyList() {
+            return graphTransposedAdjacencyList;
+        }
+
+        public Map<T, Boolean> getUsed() {
+            return used;
+        }
+
+        public Map<T, GraphParams> getParams() {
+            return params;
+        }
+
+        public ArrayList<T> getAllVertex() {
+            return allVertex;
+        }
+
+        public ArrayList<T> getOrder() {
+            return order;
+        }
+
+        public ArrayList<T> getComponent() {
+            return component;
+        }
+
         private final Map<T, ArrayList<T>> graphAdjacencyList;
         private final Map<T, ArrayList<T>> graphTransposedAdjacencyList;
         private final Map<T, Boolean> used;
@@ -83,15 +111,58 @@ public class Graph<T> implements Serializable {
         }
     }
 
-    public Snapshot createSnapshot() {
+    private Map<T, ArrayList<T>> makeDeepCopyMapArrayList(Map<T, ArrayList<T>> from, HashMap<T, ArrayList<T>> to) {
+
+        for (Map.Entry<T, ArrayList<T>> entry : from.entrySet()) {
+            to.put(entry.getKey(),
+                    new ArrayList<T>(entry.getValue()));
+        }
+
+        return to;
+    }
+
+    private Map<T, Boolean> makeDeepCopyMapBoolean(Map<T, Boolean> from, HashMap<T, Boolean> to) {
+
+        for (Map.Entry<T, Boolean> entry : from.entrySet()) {
+            to.put(entry.getKey(),
+                    (entry.getValue()));
+        }
+
+        return to;
+    }
+
+    private ArrayList<T> makeDeepCopyArrayList(ArrayList<T> from, ArrayList<T> to) {
+        to.addAll(from);
+        return to;
+    }
+
+    public <T> Snapshot createSnapshot() {
+        HashMap graphAdjacencyListCopy = new HashMap<>();
+        makeDeepCopyMapArrayList(this.getGraphAdjacencyList(), graphAdjacencyListCopy);
+
+        HashMap graphTransposedAdjacencyListCopy = new HashMap<>();
+        makeDeepCopyMapArrayList(this.getGraphTransposedAdjacencyList(), graphTransposedAdjacencyListCopy);
+
+        HashMap usedCopy = new HashMap<>();
+        makeDeepCopyMapBoolean(this.getUsed(), usedCopy);
+
+        ArrayList allVertexCopy = new ArrayList();
+        makeDeepCopyArrayList(this.getAllVertex(), allVertexCopy);
+
+        ArrayList orderCopy = new ArrayList();
+        makeDeepCopyArrayList(this.getOrder(), orderCopy);
+
+        ArrayList componentCopy = new ArrayList();
+        makeDeepCopyArrayList(this.getComponent(), componentCopy);
+
         return new Snapshot(this,
-                this.getGraphAdjacencyList(),
-                this.getGraphTransposedAdjacencyList(),
-                this.getUsed(),
+                graphAdjacencyListCopy,
+                graphTransposedAdjacencyListCopy,
+                usedCopy,
                 this.getParams(),
-                this.getAllVertex(),
-                this.getOrder(),
-                this.getComponent()
+                allVertexCopy,
+                orderCopy,
+                componentCopy
         );
     }
 
@@ -159,10 +230,6 @@ public class Graph<T> implements Serializable {
     private ArrayList<T> allVertex = new ArrayList<>();
     private ArrayList<T> order = new ArrayList<>(); // order in dfs1
     private ArrayList<T> component = new ArrayList<>();
-
-    public Graph getInstance() {
-        return this;
-    }
 
     public void addVertex(T vertex) {
         graphAdjacencyList.put(vertex, new ArrayList<T>());

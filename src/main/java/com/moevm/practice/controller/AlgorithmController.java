@@ -10,6 +10,7 @@ import com.moevm.practice.core.commands.StepBackCommand;
 import com.moevm.practice.core.commands.StepForwardCommand;
 import com.moevm.practice.core.graph.Graph;
 import com.moevm.practice.core.graph.GraphFacade;
+import com.moevm.practice.gui.GraphVisualizer;
 import com.moevm.practice.gui.GuiUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -25,7 +26,9 @@ public class AlgorithmController implements Initializable {
 
 
     private static final String STEP_FORWARD_CMD_LOG = "Шаг вперед выполнен\n";
+    private static final String STEP_FORWARD_END_CMD_LOG = "Двигаться вперед больше нельзя! Алгоритм завершен\n";
     private static final String STEP_BACK_CMD_LOG = "Шаг назад выполнен\n";
+    private static final String STEP_BACK_END_CMD_LOG = "Двигаться назад больше нельзя!\n";
     private static final String FILE_READ_CMD_LOG = "Граф прочитан из файла ";
     private static final String PAUSE_CMD_LOG = "Алгоритм приостановлен\n";
     private static final String RESUME_CMD_LOG = "Алгоритм возобновлен\n";
@@ -87,6 +90,9 @@ public class AlgorithmController implements Initializable {
 
     private StepBackCommand cmdBack;
 
+    private GraphVisualizer previousStateGraphVisualizer;
+    private GraphVisualizer currentStateGraphVisualizer;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         GuiUtils.setBorderCanvas(previousStateCanvas);
@@ -112,7 +118,15 @@ public class AlgorithmController implements Initializable {
         previousSnapshot = currentSnapshot;
         currentSnapshot = cmdForward.execute();
         mainLogText = GuiUtils.appendTextToLog(mainLogText, STEP_FORWARD_CMD_LOG, this.mainLog);
-        updateGraphsCanvas();
+        currentStateGraphVisualizer.drawGraph(currentSnapshot);
+        previousStateGraphVisualizer.drawGraph(previousSnapshot);
+        this.stepBackButton.setDisable(false);
+        if (currentSnapshot.equals(graphFacade.getHistory().getSnapshot(graphFacade.getHistory().getSize() - 1))) {
+            mainLogText = GuiUtils.appendTextToLog(mainLogText, STEP_FORWARD_END_CMD_LOG, this.mainLog);
+            this.stepForwardButton.setDisable(true);
+        }
+
+        //  updateGraphsCanvas();
     }
 
     @FXML
@@ -120,7 +134,14 @@ public class AlgorithmController implements Initializable {
         previousSnapshot = currentSnapshot;
         currentSnapshot = cmdBack.execute();
         mainLogText = GuiUtils.appendTextToLog(mainLogText, STEP_BACK_CMD_LOG, this.mainLog);
-        updateGraphsCanvas();
+        previousStateGraphVisualizer.drawGraph(previousSnapshot);
+        currentStateGraphVisualizer.drawGraph(currentSnapshot);
+        this.stepForwardButton.setDisable(false);
+        if (previousSnapshot.equals(graphFacade.getHistory().getSnapshot(0))) {
+            mainLogText = GuiUtils.appendTextToLog(mainLogText, STEP_BACK_END_CMD_LOG, this.mainLog);
+            this.stepBackButton.setDisable(true);
+        }
+        //updateGraphsCanvas();
     }
 
     @FXML
@@ -136,18 +157,17 @@ public class AlgorithmController implements Initializable {
     @FXML
     private void inputGraphFromFile() throws IOException {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Text files", "*.txt"));
-        Stage stage = (Stage) window.getScene().getWindow();
-        File selectedFile = fileChooser.showOpenDialog(stage);
-        //   File selectedFile = new File("./examples/graph_1.txt");
+//        fileChooser.getExtensionFilters().addAll(
+//                new FileChooser.ExtensionFilter("Text files", "*.txt"));
+//        Stage stage = (Stage) window.getScene().getWindow();
+//        File selectedFile = fileChooser.showOpenDialog(stage);
+        File selectedFile = new File("./examples/graph_1.txt");
         graphReader = new BufferedReader(new FileReader(selectedFile));
         initGraph();
         setButtonsDisabledState(false);
         mainLogText = GuiUtils.appendTextToLog(mainLogText,
                 FILE_READ_CMD_LOG + selectedFile.getName() + "\n",
                 this.mainLog);
-
     }
 
     private void initGraph() {
@@ -157,14 +177,17 @@ public class AlgorithmController implements Initializable {
         cmdBack = new StepBackCommand(graphFacade.getHistory());
         previousSnapshot = graphFacade.getHistory().getSnapshot(0);
         currentSnapshot = previousSnapshot;
-        updateGraphsCanvas();
+        previousStateGraphVisualizer = new GraphVisualizer(previousStateCanvas, previousSnapshot);
+        currentStateGraphVisualizer = new GraphVisualizer(currentStateCanvas, currentSnapshot);
+        previousStateGraphVisualizer.setGuiVerticesList(currentStateGraphVisualizer.getGuiVerticesList());
+        // updateGraphsCanvas();
     }
 
 
     private String graphBufferedReaderString = "";
 
     private void appendGraphBufferedReaderString(String str) {
-        if(!str.equals("")) {
+        if (!str.equals("")) {
             graphBufferedReaderString += str + "\n";
         }
     }
@@ -212,6 +235,10 @@ public class AlgorithmController implements Initializable {
         setButtonsDisabledState(true);
         GuiUtils.clearCanvas(previousStateCanvas);
         GuiUtils.clearCanvas(currentStateCanvas);
+        previousStateGraphVisualizer = null;
+        currentStateGraphVisualizer = null;
+        currentSnapshot = null;
+        previousSnapshot = null;
     }
 
     private void setButtonsDisabledState(Boolean state) {

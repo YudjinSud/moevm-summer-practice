@@ -51,7 +51,7 @@ public class GuiUtils {
     }
 
     public static void clearCanvas(Canvas canvas) {
-        canvas.getGraphicsContext2D().clearRect(2, 2, canvas.getWidth() - 2, canvas.getHeight() - 2);
+        canvas.getGraphicsContext2D().clearRect(1, 1, canvas.getWidth() - 1, canvas.getHeight() - 1);
     }
 
 }
