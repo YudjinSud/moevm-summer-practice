@@ -127,9 +127,25 @@ public class GraphVisualizer {
         }
 
 
-        public GuiVertexWrapper(int id, String value, double canvasHeight, double canvasWidth) {
+        private boolean isIntersected(ArrayList<GuiVertexWrapper> guiVerticesList) {
+            for(GuiVertexWrapper v : guiVerticesList) {
+                int xDist  = Math.abs(this.x - v.x);
+                int yDist  = Math.abs(this.y - v.y);
+                if(Math.sqrt( xDist * xDist + yDist *yDist) < (SHAPE_RADIUS * 2)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        public GuiVertexWrapper(int id, String value, double canvasHeight, double canvasWidth, ArrayList<GuiVertexWrapper> guiVerticesList) {
             this.x = getRandomNumberRange(SHAPE_RADIUS, (int) canvasWidth - SHAPE_RADIUS);
             this.y = getRandomNumberRange(SHAPE_RADIUS, (int) canvasHeight - SHAPE_RADIUS);
+            while(this.isIntersected(guiVerticesList)) {
+                this.x = getRandomNumberRange(SHAPE_RADIUS, (int) canvasWidth - SHAPE_RADIUS);
+                this.y = getRandomNumberRange(SHAPE_RADIUS, (int) canvasHeight - SHAPE_RADIUS);
+            }
             this.used = false;
             this.id = id;
             this.value = value;
@@ -174,7 +190,8 @@ public class GraphVisualizer {
             this.graphVerticesMap.put(v.toString(), counter);
             this.guiVerticesList.add(new GuiVertexWrapper(counter++, v.toString(),
                     graphicsContext.getCanvas().getHeight(),
-                    graphicsContext.getCanvas().getWidth()));
+                    graphicsContext.getCanvas().getWidth(),
+                    this.guiVerticesList));
         }
     }
 
