@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class GraphVisualizer {
+
     private class GuiVertexWrapper {
         private final int SHAPE_RADIUS = 25;
         private final int ARROW_HEAD_SIZE = 10;
@@ -72,7 +73,7 @@ public class GraphVisualizer {
             double x2 = (1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * ARROW_HEAD_SIZE;
             double y2 = (1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * ARROW_HEAD_SIZE;
 
-            graphicsContext.moveTo(this.x, this.y);
+
             int tox, toy;
             if (angle < Math.PI / 2) {
                 tox = to.x - SHAPE_RADIUS / 2;
@@ -81,10 +82,30 @@ public class GraphVisualizer {
                 tox = to.x + SHAPE_RADIUS / 2;
                 toy = to.y + SHAPE_RADIUS / 2;
             }
+            // try to create mama
 
+            //to = v, this = u
+
+            double rast = (Math.sqrt((to.x - this.x) * (to.x - this.x) + (to.y - this.y) * (to.y - this.y)));
+
+            double cos_i = (to.x - this.x) / rast;
+            double sin_i = Math.sqrt(1 - cos_i * cos_i);
+
+            double s_y = SHAPE_RADIUS * sin_i;
+            double s_x = SHAPE_RADIUS * cos_i;
+
+            if (this.y > to.y) {
+                graphicsContext.moveTo(this.x - s_x, this.y + s_y);
+                graphicsContext.lineTo(to.x + s_x, to.y - s_y);
+            } else {
+                graphicsContext.moveTo(this.x - s_x, this.y - s_y);
+                graphicsContext.lineTo(to.x + s_x, to.y + s_y);
+            }
+/*
+            graphicsContext.moveTo(this.x, this.y);
             graphicsContext.lineTo(tox, toy);
 
-
+*/
             graphicsContext.lineTo(x1 + tox, y1 + toy);
             graphicsContext.lineTo(x2 + tox, y2 + toy);
             graphicsContext.lineTo(tox, toy);
@@ -123,7 +144,6 @@ public class GraphVisualizer {
     public ArrayList<GuiVertexWrapper> getGuiVerticesList() {
         return this.guiVerticesList;
     }
-
 
     private ArrayList<GuiVertexWrapper> guiVerticesList;
 

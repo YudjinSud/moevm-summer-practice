@@ -16,6 +16,10 @@ import com.moevm.practice.core.graph.GraphFacade;
 import com.moevm.practice.core.snapshot.GraphHistory;
 import com.moevm.practice.gui.GraphVisualizer;
 import com.moevm.practice.gui.GuiUtils;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -25,6 +29,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class AlgorithmController implements Initializable {
 
@@ -36,7 +41,7 @@ public class AlgorithmController implements Initializable {
     private static final String FILE_READ_CMD_LOG = "Граф прочитан из файла ";
     private static final String PAUSE_CMD_LOG = "Алгоритм приостановлен\n";
     private static final String RESUME_CMD_LOG = "Алгоритм возобновлен\n";
-    private static final String PROCESS_TO_FINISH_CMD_LOG = "Алгоритм просчитан до конца\n";
+    private static final String PROCESS_TO_FINISH_CMD_LOG = "Запуск просчета алгоритма до конца\n";
     private static final String RESET_CMD_LOG = "Все сброшено! Введите граф заново \n";
 
     private Graph.Snapshot previousSnapshot;
@@ -191,11 +196,13 @@ public class AlgorithmController implements Initializable {
     @FXML
     private void pause() {
         mainLogText = GuiUtils.appendTextToLog(mainLogText, PAUSE_CMD_LOG, this.mainLog);
+        timeline.pause();
     }
 
     @FXML
     private void resume() {
         mainLogText = GuiUtils.appendTextToLog(mainLogText, RESUME_CMD_LOG, this.mainLog);
+        timeline.play();
     }
 
     @FXML
@@ -327,8 +334,19 @@ public class AlgorithmController implements Initializable {
         }
     }
 
+    private AlgorithmController cntrl = this;
+
+    private Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
+        @Override
+        public void handle(ActionEvent event) {
+            cntrl.stepForward();
+        }
+    }));
+
     @FXML
     private void processToFinish() {
+        timeline.setCycleCount(this.graphFacade.getHistory().getSize() - 1 - Command.snapshotPointer);
+        timeline.play();
         mainLogText = GuiUtils.appendTextToLog(mainLogText, PROCESS_TO_FINISH_CMD_LOG, this.mainLog);
     }
 
