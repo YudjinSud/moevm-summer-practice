@@ -3,6 +3,7 @@ package com.moevm.practice.core.graph;
 import com.moevm.practice.core.snapshot.GraphHistory;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.*;
 
@@ -75,6 +76,10 @@ public class Graph<T> implements Serializable {
             return component;
         }
 
+        public ArrayList<ArrayList<T>> getStronglyConnectedComponents() {
+            return stronglyConnectedComponents;
+        }
+
         private final Map<T, ArrayList<T>> graphAdjacencyList;
         private final Map<T, ArrayList<T>> graphTransposedAdjacencyList;
         private final Map<T, Boolean> used;
@@ -83,13 +88,24 @@ public class Graph<T> implements Serializable {
         private final ArrayList<T> order;
         private final ArrayList<T> component;
 
+
+        private ArrayList<ArrayList<T>> stronglyConnectedComponents = new ArrayList<>();
+
+        public GraphHistory.AlgorithmState getState() {
+            return state;
+        }
+
+        private final GraphHistory.AlgorithmState state;
+
         public Snapshot(Graph<T> graph, Map<T, ArrayList<T>> graphAdjacencyList,
                         Map<T, ArrayList<T>> graphTransposedAdjacencyList,
                         Map<T, Boolean> used,
                         Map<T, GraphParams> params,
                         ArrayList<T> allVertex,
                         ArrayList<T> order,
-                        ArrayList<T> component) {
+                        ArrayList<T> component,
+                        ArrayList<ArrayList<T>> stronglyConnectedComponents,
+                        GraphHistory.AlgorithmState state) {
             this.graph = graph;
             this.graphAdjacencyList = graphAdjacencyList;
             this.graphTransposedAdjacencyList = graphTransposedAdjacencyList;
@@ -98,6 +114,8 @@ public class Graph<T> implements Serializable {
             this.allVertex = allVertex;
             this.order = order;
             this.component = component;
+            this.stronglyConnectedComponents = stronglyConnectedComponents;
+            this.state = state;
         }
 
         public void restore() {
@@ -136,7 +154,21 @@ public class Graph<T> implements Serializable {
         return to;
     }
 
-    public <T> Snapshot createSnapshot() {
+    private ArrayList<ArrayList<T>> makeDeepCopyMatrix(ArrayList<ArrayList<T>> from, ArrayList<ArrayList<T>> to) {
+        for(int i = 0; i < from.size(); i++) {
+            to.add(new ArrayList<>());
+        }
+        int counter = 0;
+        for(ArrayList<T> l : from) {
+            for(T x : l) {
+                to.get(counter).add(x);
+            }
+            counter++;
+        }
+        return to;
+    }
+
+    public <T> Snapshot createSnapshot(GraphHistory.AlgorithmState state) {
         HashMap graphAdjacencyListCopy = new HashMap<>();
         makeDeepCopyMapArrayList(this.getGraphAdjacencyList(), graphAdjacencyListCopy);
 
@@ -155,6 +187,9 @@ public class Graph<T> implements Serializable {
         ArrayList componentCopy = new ArrayList();
         makeDeepCopyArrayList(this.getComponent(), componentCopy);
 
+        ArrayList stronglyConnectedComponentsCopy = new ArrayList();
+        makeDeepCopyMatrix(this.getStronglyConnectedComponents(), stronglyConnectedComponentsCopy);
+
         return new Snapshot(this,
                 graphAdjacencyListCopy,
                 graphTransposedAdjacencyListCopy,
@@ -162,7 +197,9 @@ public class Graph<T> implements Serializable {
                 this.getParams(),
                 allVertexCopy,
                 orderCopy,
-                componentCopy
+                componentCopy,
+                stronglyConnectedComponentsCopy,
+                state
         );
     }
 
@@ -231,6 +268,12 @@ public class Graph<T> implements Serializable {
     private ArrayList<T> order = new ArrayList<>(); // order in dfs1
     private ArrayList<T> component = new ArrayList<>();
 
+    public ArrayList<ArrayList<T>> getStronglyConnectedComponents() {
+        return stronglyConnectedComponents;
+    }
+
+    private ArrayList<ArrayList<T>> stronglyConnectedComponents = new ArrayList<>();
+
     public void addVertex(T vertex) {
         graphAdjacencyList.put(vertex, new ArrayList<T>());
         graphTransposedAdjacencyList.put(vertex, new ArrayList<T>());
@@ -285,20 +328,20 @@ public class Graph<T> implements Serializable {
 
     private void dfs1(T vertex) {
         used.put(vertex, true);
-        this.history.backUp();
+        this.history.backUp(GraphHistory.AlgorithmState.FIRST_DFS);
         for (T s : graphAdjacencyList.get(vertex)) {
             if (!used.get(s)) {
                 dfs1(s);
             }
         }
         order.add(vertex);
-        this.history.backUp();
+        this.history.backUp(GraphHistory.AlgorithmState.FIRST_DFS);
     }
 
     private void dfs2(T vertex) {
         used.put(vertex, true);
         component.add(vertex);
-        this.history.backUp();
+        this.history.backUp(GraphHistory.AlgorithmState.SECOND_DFS);
         for (T s : graphTransposedAdjacencyList.get(vertex)) {
             if (!used.get(s)) {
                 dfs2(s);
@@ -327,17 +370,19 @@ public class Graph<T> implements Serializable {
         for (T v : allVertex) {
             used.put(v, false);
         }
-        this.history.backUp();
+        this.history.backUp(GraphHistory.AlgorithmState.VERTICES_TRANSPOSED);
         int num = 1;
         for (T v : allVertex) {
             T z = order.get(order.size() - getNum(v) - 1);
             if (!used.get(z)) {
                 dfs2(z);
+                this.stronglyConnectedComponents.add(this.component);
                 printComponent(num++);
+                this.history.backUp(GraphHistory.AlgorithmState.COMPONENT_ADDED);
                 component.clear();
-                this.history.backUp();
             }
         }
+        this.history.backUp(GraphHistory.AlgorithmState.COMPLETED);
 
     }
 }

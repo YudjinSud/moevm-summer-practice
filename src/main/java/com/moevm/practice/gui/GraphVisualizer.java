@@ -1,6 +1,7 @@
 package com.moevm.practice.gui;
 
 import com.moevm.practice.core.graph.Graph;
+import com.moevm.practice.core.snapshot.GraphHistory;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -9,6 +10,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +37,13 @@ public class GraphVisualizer {
 
         private int id;
 
-        private void drawValue() {
+        private int connectedComponentId = -1;
+
+        private Boolean inConnectedComponent = false;
+
+        private Color connectedComponentColor;
+
+        private void drawVertexValue() {
             graphicsContext.setFont(new Font(Font.getDefault().getName(), 16));
             graphicsContext.setFill(Color.BLACK);
             graphicsContext.setTextAlign(TextAlignment.CENTER);
@@ -58,24 +66,23 @@ public class GraphVisualizer {
             double sin = Math.sin(angle);
             double cos = Math.cos(angle);
 
-            double x1 = (-1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * ARROW_HEAD_SIZE ;
-            double y1 = (-1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * ARROW_HEAD_SIZE ;
+            double x1 = (-1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * ARROW_HEAD_SIZE;
+            double y1 = (-1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * ARROW_HEAD_SIZE;
 
-            double x2 = (1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * ARROW_HEAD_SIZE ;
-            double y2 = (1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * ARROW_HEAD_SIZE ;
+            double x2 = (1.0 / 2.0 * cos + Math.sqrt(3) / 2 * sin) * ARROW_HEAD_SIZE;
+            double y2 = (1.0 / 2.0 * sin - Math.sqrt(3) / 2 * cos) * ARROW_HEAD_SIZE;
 
             graphicsContext.moveTo(this.x, this.y);
             int tox, toy;
-            if(angle < Math.PI / 2) {
+            if (angle < Math.PI / 2) {
                 tox = to.x - SHAPE_RADIUS / 2;
                 toy = to.y - SHAPE_RADIUS / 2;
-            }
-            else {
+            } else {
                 tox = to.x + SHAPE_RADIUS / 2;
                 toy = to.y + SHAPE_RADIUS / 2;
             }
 
-            graphicsContext.lineTo(tox,toy);
+            graphicsContext.lineTo(tox, toy);
 
 
             graphicsContext.lineTo(x1 + tox, y1 + toy);
@@ -88,12 +95,16 @@ public class GraphVisualizer {
 
         private void draw() {
             graphicsContext.strokeOval(x - SHAPE_RADIUS, y - SHAPE_RADIUS, SHAPE_RADIUS * 2, SHAPE_RADIUS * 2);
-            if(this.used) {
+            if (this.used && !this.inConnectedComponent) {
                 graphicsContext.setFill(Color.GREEN);
                 graphicsContext.fillOval(x - SHAPE_RADIUS, y - SHAPE_RADIUS, SHAPE_RADIUS * 2, SHAPE_RADIUS * 2);
+            } else if (this.inConnectedComponent) {
+                graphicsContext.setFill(this.connectedComponentColor);
+                graphicsContext.fillOval(x - SHAPE_RADIUS, y - SHAPE_RADIUS, SHAPE_RADIUS * 2, SHAPE_RADIUS * 2);
             }
-            this.drawValue();
+            this.drawVertexValue();
         }
+
 
         public GuiVertexWrapper(int id, String value, double canvasHeight, double canvasWidth) {
             this.x = getRandomNumberRange(SHAPE_RADIUS, (int) canvasWidth - SHAPE_RADIUS);
@@ -147,14 +158,55 @@ public class GraphVisualizer {
         }
     }
 
-    public <T> void updateState(Graph.Snapshot updatedGraph) {
-        Map<T, Boolean> usedMap = updatedGraph.getUsed();
-        for(T v :usedMap.keySet()) {
-            guiVerticesList.get(graphVerticesMap.get(v.toString())).used = usedMap.get(v);
+    public <T> void clearConnectedComponent(Graph.Snapshot graph) {
+        if(graph.getStronglyConnectedComponents().size() == 0) return;
+        ArrayList<T> last = (ArrayList<T>) graph.getStronglyConnectedComponents().get(graph.getStronglyConnectedComponents().size() - 1);
+
+        for(T v : last) {
+            guiVerticesList.get(graphVerticesMap.get(v.toString())).inConnectedComponent = false;
         }
 
-        Map<T, ArrayList<T>> transposedAdjacencyList = updatedGraph.getGraphTransposedAdjacencyList();
-        System.out.println();
+    }
+
+    private <T> void updateState(Graph.Snapshot updatedGraph) {
+        Map<T, Boolean> usedMap = updatedGraph.getUsed();
+        for (T v : usedMap.keySet()) {
+            guiVerticesList.get(graphVerticesMap.get(v.toString())).used = usedMap.get(v);
+//            guiVerticesList.get(graphVerticesMap.get(v.toString())).connectedComponentColor = Color.WHITE;
+//            guiVerticesList.get(graphVerticesMap.get(v.toString())).inConnectedComponent = false;
+        }
+
+        if(updatedGraph.getState() == GraphHistory.AlgorithmState.COMPONENT_ADDED) {
+            ArrayList<ArrayList<T>> scc = updatedGraph.getStronglyConnectedComponents();
+            for (ArrayList<T> component : scc) {
+                Color componentColor = GuiUtils.makeRandomColor(component.toString());
+                for (T v : component) {
+                    guiVerticesList.get(graphVerticesMap.get(v.toString())).connectedComponentColor = componentColor;
+                    guiVerticesList.get(graphVerticesMap.get(v.toString())).inConnectedComponent = true;
+                }
+            }
+        }
+
+
+}
+
+    private <T> void drawEdges(Graph.Snapshot graph) {
+        Map<T, ArrayList<T>> graphAdjacencyList = new HashMap<>();
+        if (!graph.getState().equals(GraphHistory.AlgorithmState.VERTICES_TRANSPOSED)) {
+            graphAdjacencyList = graph.getGraphAdjacencyList();
+        } else {
+            graphAdjacencyList = graph.getGraphTransposedAdjacencyList();
+        }
+
+        int counter = 0;
+        for (T from : graphAdjacencyList.keySet()) {
+            for (T to : graphAdjacencyList.get(from)) {
+                GuiVertexWrapper guiFrom = guiVerticesList.get(graphVerticesMap.get(from.toString()));
+                GuiVertexWrapper guiTo = guiVerticesList.get(graphVerticesMap.get(to.toString()));
+                guiFrom.drawEdge(guiTo);
+                counter++;
+            }
+        }
     }
 
 
@@ -164,17 +216,7 @@ public class GraphVisualizer {
         for (GuiVertexWrapper v : guiVerticesList) {
             v.draw();
         }
-
-        Map<T, ArrayList<T>> graphAdjacencyList = graph.getGraphAdjacencyList();
-        int counter  = 0;
-        for (T from : graphAdjacencyList.keySet()) {
-            for(T to : graphAdjacencyList.get(from)) {
-                GuiVertexWrapper guiFrom = guiVerticesList.get(graphVerticesMap.get(from.toString()));
-                GuiVertexWrapper guiTo = guiVerticesList.get(graphVerticesMap.get(to.toString()));
-                guiFrom.drawEdge(guiTo);
-                counter++;
-            }
-        }
+        this.drawEdges(graph);
     }
 }
 

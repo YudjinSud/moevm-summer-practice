@@ -2,14 +2,18 @@ package com.moevm.practice.controller;
 
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.moevm.practice.core.commands.Command;
 import com.moevm.practice.core.commands.StepBackCommand;
 import com.moevm.practice.core.commands.StepForwardCommand;
 import com.moevm.practice.core.graph.Graph;
 import com.moevm.practice.core.graph.GraphFacade;
+import com.moevm.practice.core.snapshot.GraphHistory;
 import com.moevm.practice.gui.GraphVisualizer;
 import com.moevm.practice.gui.GuiUtils;
 import javafx.fxml.FXML;
@@ -25,7 +29,7 @@ import javafx.stage.Stage;
 public class AlgorithmController implements Initializable {
 
 
-    private static final String STEP_FORWARD_CMD_LOG = "Шаг вперед выполнен\n";
+    private static final String STEP_FORWARD_CMD_LOG = "Шаг вперед выполнен. ";
     private static final String STEP_FORWARD_END_CMD_LOG = "Двигаться вперед больше нельзя! Алгоритм завершен\n";
     private static final String STEP_BACK_CMD_LOG = "Шаг назад выполнен\n";
     private static final String STEP_BACK_END_CMD_LOG = "Двигаться назад больше нельзя!\n";
@@ -116,11 +120,44 @@ public class AlgorithmController implements Initializable {
     }
 
 
+    private <T> String findNewUsedVertices() {
+        StringBuilder res = new StringBuilder("Посещены вершины: ");
+        Map newUsed = currentSnapshot.getUsed();
+        Map prevUsed = previousSnapshot.getUsed();
+        for (Object n : currentSnapshot.getUsed().keySet()) {
+            if (!prevUsed.get(n).equals(newUsed.get(n))) {
+                res.append(n.toString()).append(" ");
+            }
+        }
+
+        return res.toString();
+    }
+
+    private <T> String getNewComponentAdded() {
+        StringBuilder res = new StringBuilder("");
+        ArrayList component = currentSnapshot.getComponent();
+        for (Object s : component) {
+            res.append(s.toString()).append(" ");
+        }
+        return res.toString();
+    }
+
+
     @FXML
     private void stepForward() {
         previousSnapshot = currentSnapshot;
         currentSnapshot = cmdForward.execute();
-        mainLogText = GuiUtils.appendTextToLog(mainLogText, STEP_FORWARD_CMD_LOG, this.mainLog);
+        String thisStepUpdate = "";
+        if (currentSnapshot.getState() == GraphHistory.AlgorithmState.FIRST_DFS) {
+            thisStepUpdate = "Первый обход в глубину. " + findNewUsedVertices();
+        } else if (currentSnapshot.getState() == GraphHistory.AlgorithmState.VERTICES_TRANSPOSED) {
+            thisStepUpdate = "Ребра перевернуты.";
+        } else if (currentSnapshot.getState() == GraphHistory.AlgorithmState.SECOND_DFS) {
+            thisStepUpdate = "Второй обход в глубину. " + findNewUsedVertices();
+        } else if (currentSnapshot.getState() == GraphHistory.AlgorithmState.COMPONENT_ADDED) {
+            thisStepUpdate = "Найдена компонента связности: " + getNewComponentAdded();
+        }
+        mainLogText = GuiUtils.appendTextToLog(mainLogText, STEP_FORWARD_CMD_LOG + thisStepUpdate, this.mainLog);
         currentStateGraphVisualizer.drawGraph(currentSnapshot);
         previousStateGraphVisualizer.drawGraph(previousSnapshot);
         this.stepBackButton.setDisable(false);
@@ -134,8 +171,12 @@ public class AlgorithmController implements Initializable {
 
     @FXML
     private void stepBack() {
-        previousSnapshot = currentSnapshot;
-        currentSnapshot = cmdBack.execute();
+        if (currentSnapshot.getState() == GraphHistory.AlgorithmState.COMPONENT_ADDED) {
+            previousStateGraphVisualizer.clearConnectedComponent(previousSnapshot);
+            currentStateGraphVisualizer.clearConnectedComponent(currentSnapshot);
+        }
+        currentSnapshot = previousSnapshot;
+        previousSnapshot = cmdBack.execute();
         mainLogText = GuiUtils.appendTextToLog(mainLogText, STEP_BACK_CMD_LOG, this.mainLog);
         previousStateGraphVisualizer.drawGraph(previousSnapshot);
         currentStateGraphVisualizer.drawGraph(currentSnapshot);
@@ -178,6 +219,7 @@ public class AlgorithmController implements Initializable {
         graphFacade.runMainAlgo();
         cmdForward = new StepForwardCommand(graphFacade.getHistory());
         cmdBack = new StepBackCommand(graphFacade.getHistory());
+        Command.snapshotPointer = 0;
         previousSnapshot = graphFacade.getHistory().getSnapshot(0);
         currentSnapshot = previousSnapshot;
         previousStateGraphVisualizer = new GraphVisualizer(previousStateCanvas, previousSnapshot);
